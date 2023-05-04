@@ -7,16 +7,17 @@
 #### jog backward        = jog_bwd,conv,0
 #### stop conveyor       = jog_stop,conv,0
 #########################################################
-
 import socket,time
-import config
-
+# Construct conveyor class
 class Conveyor():
+   # Init function
    def __init__(self, host='10.10.0.98', conveyor_port = 2002):
+      # All attributes
       self.host = host
       self.conveyor_port = conveyor_port
       self.conveyor_recv = None
       self.conveyor = None
+      # Start server and accept connection
       print("Conveyor init")
       print(f"HOST: {self.host}, PORT: {self.conveyor_port}")
       socket_server = socket.socket()
@@ -24,6 +25,7 @@ class Conveyor():
       print('Conveyor bind')
       socket_server.listen()
       print('Conveyor listen on port ', self.conveyor_port)
+      # Accept connection
       self.conveyor, addr = socket_server.accept()
       time.sleep(0.5)
       print("Conveyor accept")
@@ -31,34 +33,31 @@ class Conveyor():
       # Activate tcp
       self.send_command("activate,tcp")
       print("Conveyor activate tcp")
+      # Power on servo
       self.send_command("pwr_on,conv,0")
       print("Conveyor power on")
    
    def send_command(self, cmd):
-       self.conveyor.sendall(f"{cmd}\n".encode())
-       time.sleep(0.5)
+      '''Send command to conveyor'''
+      self.conveyor.sendall(f"{cmd}\n".encode())
+      time.sleep(0.5)
 
    def run_conveyor(self, speed=10):
+      '''Run conveyor with the speed of 1 cm/s'''
       self.send_command("jog_stop,conv,0")
       print("Reset conveyor")
-      # self.send_command(f"set_vel,conv,{speed}")
-      print("Set speed to 10")
-
+      print("Set speed to 1 cm/s")
+      # start moving
       self.send_command("jog_fwd,conv,0")
       print('Start Moving')
    
    def stop_conveyor(self):
+      # Stop conveyor
       self.send_command("jog_stop,conv,0")
       print('Stop conveyor')
 
    def main(self):
-      # Move conveyor
+      '''Main function to test conveyor'''
       self.run_conveyor()
       time.sleep(10)
       self.stop_conveyor()
-
-
-if __name__ == '__main__':
-   
-      conveyor = Conveyor()
-      conveyor.stop_conveyor()
